@@ -9,6 +9,12 @@ def connect_db(app):
 
 class User(db.Model):
 
+    def __repr__(self):
+        return f"My name is {self.get_full_name()}."
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

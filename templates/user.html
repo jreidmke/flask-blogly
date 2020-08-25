@@ -8,4 +8,12 @@
 
 <h1>Hello {{user.first_name}} {{user.last_name}}</h1>
 
+<form action="/users/{{user.id}}/edit">
+    <button>Edit User</button>
+</form>
+
+<form action="/users/{{user.id}}/delete" method="POST">
+    <button>Delete User</button>
+</form>
+
 {% endblock %}
