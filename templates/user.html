@@ -8,12 +8,22 @@
 
 <h1>Hello {{user.first_name}} {{user.last_name}}</h1>
 
+<ul>
+    {% for post in user.posts %}
+        <li><a href="/posts/{{post.id}}">{{post.title}}</a></li>
+    {% endfor %}
+</ul>
+
 <form action="/users/{{user.id}}/edit">
     <button>Edit User</button>
 </form>
 
 <form action="/users/{{user.id}}/delete" method="POST">
     <button>Delete User</button>
+</form>
+
+<form action="/users/{{user.id}}/posts/new">
+    <button>Add Post</button>
 </form>
 
 {% endblock %}

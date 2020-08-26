@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from app import app
-from models import db, User, Post
+from models import db, Post, User
 
 # Use test database and don't clutter tests with SQL
 
@@ -16,56 +16,57 @@ app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 db.drop_all()
 db.create_all()
 
-class UserViewTestCase(TestCase):
-    """Tests for views for users"""
+class PostViewTestCase(TestCase):
 
     def setUp(self):
-
+        Post.query.delete()
         User.query.delete()
 
         user = User(first_name="Maria", last_name="Aldapa", image_url='https://pbs.twimg.com/ profile_images/2880657358/7076189976277c6be2d745cead4bd3fb.jpeg')
-
         db.session.add(user)
         db.session.commit()
         self.user_id = user.id
 
+        users = User.query.all()
+        post = Post(user_id=self.user_id, title='Pizza', content='I like pizza.')
+        db.session.add(post)
+        db.session.commit()
+        self.post_id = post.id
+
     def tearDown(self):
         db.session.rollback()
 
-    def test_redirect(self):
-        with app.test_client()as client:
-            resp = client.get('/')
-            self.assertEqual(resp.status_code, 302)
-
-
-    def test_user_list(self):
+    def test_new_post_on_user_detail(self):
         with app.test_client() as client:
-            resp = client.get('/users')
+            resp = client.get(f'/users/{self.user_id}')
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('Maria', html)
+            self.assertIn('Pizza', html)
 
-    def test_user_details(self):
+    def test_make_new_post(self):
+        data = {f'user_id': {self.user_id}, 'title': 'Movies', 'content': 'Movies are good'}
         with app.test_client() as client:
-            resp = client.get(f'users/{self.user_id}')
+            resp = client.post(f'/users/{self.user_id}/posts/new', data=data, follow_redirects=True)
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('Maria Aldapa', html)
+            self.assertIn('Movies', html)
 
-    def test_add_user(self):
+    def test_show_post_details(self):
         with app.test_client() as client:
-            resp = client.post('/users', data = {'first_name': 'James', 'last_name': 'Reid', 'image_url': 'https://i.pinimg.com/originals/9e/9f/21/9e9f21f31b2b612c517ac86340d05a32.jpg'}, follow_redirects=True)
+            resp = client.get(f'/posts/{self.post_id}')
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('James', html)
+            self.assertIn('I like pizza', html)
 
-    def test_edit_user(self):
+    def test_edit_post(self):
+        data = {'title': 'Candy', 'content': 'I like candy'}
+
         with app.test_client() as client:
-            resp = client.post(f'/{self.user_id}', data={'first_name': 'Mary', 'last_name': 'Alda', 'image_url': 'https://pbs.twimg.com/profile_images/2880657358/7076189976277c6be2d745cead4bd3fb.jpeg'}, follow_redirects=True)
+            resp = client.post(f'/posts/{self.post_id}/edit', data = data, follow_redirects=True)
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('Alda, Mary', html)
+            self.assertIn('Candy', html)
