@@ -25,7 +25,7 @@ def show_home():
 
 @app.route('/users')
 def show_users():
-    users = User.query.filter(User.id > 0).order_by(User.last_name.asc())
+    users = User.query.order_by(User.last_name.asc()).all()
     return render_template('home.html', users = users)
 
 # Show User Details
@@ -46,8 +46,6 @@ def create_new_user():
     first_name = request.form['first_name']
     last_name = request.form['last_name']
     image_url = request.form['image_url']
-    if image_url == "":
-        image_url = 'https://merriam-webster.com/assets/mw/images/article/art-wap-article-main/egg-3442-e1f6463624338504cd021bf23aef8441@1x.jpg'
     new_user = User(first_name = first_name, last_name = last_name, image_url = image_url)
     db.session.add(new_user)
     db.session.commit()
@@ -66,8 +64,6 @@ def show_updated_user_page(user_id):
     first_name = request.form['first_name']
     last_name = request.form['last_name']
     image_url = request.form['image_url']
-    if image_url == "":
-        image_url = 'https://merriam-webster.com/assets/mw/images/article/art-wap-article-main/egg-3442-e1f6463624338504cd021bf23aef8441@1x.jpg'
     user.first_name = first_name
     user.last_name = last_name
     user.image_url = image_url

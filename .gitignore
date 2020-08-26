@@ -1,3 +1,4 @@
 .vscode/
 venv/
 seed.py
+__pycache__/
