@@ -28,6 +28,9 @@ class User(db.Model):
 
 class Post(db.Model):
 
+    def __repr__(self):
+        return f"{self.title} is title"
+
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -36,3 +39,23 @@ class Post(db.Model):
     content = db.Column(db.String(1000), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False,
     default=datetime.utcnow)
+
+    tags = db.relationship('PostTag', cascade="all, delete", backref='post')
+
+class Tag(db.Model):
+
+    __tablename__ = 'tags'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String, nullable=False)
+
+    posts = db.relationship('PostTag', cascade="all, delete", backref='tag')
+
+
+
+class PostTag(db.Model):
+
+    __tablename__ = 'post_tags'
+
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)

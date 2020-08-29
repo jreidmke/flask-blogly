@@ -2,7 +2,7 @@
 
 from flask import Flask, request, redirect, render_template
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Post
+from models import db, connect_db, User, Post, Tag, PostTag
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Rebel4ceradio@localhost/blogly'
@@ -21,19 +21,20 @@ db.create_all()
 
 @app.route('/')
 def show_home():
-    return redirect('/users')
+    return render_template('home.html')
 
 @app.route('/users')
 def show_users():
     users = User.query.order_by(User.last_name.asc()).all()
-    return render_template('home.html', users = users)
+    posts = Post.query.all()
+    return render_template('users.html', users = users, posts = posts)
 
 # Show User Details
 
 @app.route('/users/<int:user_id>')
 def show_user_detail(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template('user.html', user = user)
+    return render_template('users.html', user = user)
 
 # Add New User
 
@@ -84,7 +85,8 @@ def show_delete_page(user_id):
 @app.route('/users/<int:user_id>/posts/new')
 def show_add_post_page(user_id):
     user = User.query.get(user_id)
-    return render_template('add-post.html', user = user)
+    tags = Tag.query.all()
+    return render_template('add-post.html', user = user, tags = tags)
 
 @app.route('/users/<int:user_id>/posts/new', methods=["POST"])
 def add_post(user_id):
@@ -93,6 +95,11 @@ def add_post(user_id):
     content = request.form['content']
     post = Post(user_id=user_id, title=title, content=content)
     db.session.add(post)
+    db.session.commit()
+    tags = request.form.getlist('tags')
+    for tag in tags:
+        tag = PostTag(post_id=post.id, tag_id = tag)
+        db.session.add(tag)
     db.session.commit()
     return redirect(f'/users/{user.id}')
 
@@ -108,7 +115,8 @@ def show_post_details(post_id):
 @app.route('/posts/<int:post_id>/edit')
 def show_edit_page(post_id):
     post = Post.query.get(post_id)
-    return render_template('edit-post.html', post=post)
+    tags = Tag.query.all()
+    return render_template('edit-post.html', post=post, tags = tags)
 
 @app.route('/posts/<int:post_id>/edit', methods=['POST'])
 def make_post_edit(post_id):
@@ -118,6 +126,11 @@ def make_post_edit(post_id):
     post.title = title
     post.content = content
     db.session.add(post)
+    db.session.commit()
+    tags = request.form.getlist('tags')
+    for tag in tags:
+        tag = PostTag(post_id=post.id, tag_id = tag)
+        db.session.add(tag)
     db.session.commit()
     return redirect(f'/users/{post.user_id}')
 
@@ -130,3 +143,44 @@ def delete_post(post_id):
     Post.query.filter_by(id=post_id).delete()
     db.session.commit()
     return redirect(f'/users/{user_id}')
+
+# Show tags
+
+@app.route('/tags/')
+def show_tags_page():
+    tags = Tag.query.all()
+    return render_template('tags.html', tags = tags)
+
+@app.route('/tags/<int:tag_id>')
+def show_tag_detail(tag_id):
+    tag = Tag.query.get(tag_id)
+    return render_template('tag-detail.html', tag = tag)
+
+#Make new Tags
+
+@app.route('/tags/new')
+def show_new_tags_page():
+    return render_template ('new-tags.html')
+
+@app.route('/tags/new', methods=["POST"])
+def make_new_tag():
+    name = request.form['name']
+    tag = Tag(name=name)
+    db.session.add(tag)
+    db.session.commit()
+    return redirect('/tags')
+
+# Edit tag
+
+@app.route('/tags/<int:tag_id>/edit')
+def show_edit_tag_page(tag_id):
+    tag = Tag.query.get(tag_id)
+    return render_template('edit-tag.html', tag=tag)
+
+@app.route('/tags/<int:tag_id>/edit', methods=["POST"])
+def edit_tag(tag_id):
+    tag = Tag.query.get(tag_id)
+    tag.name = request.form['name']
+    db.session.add(tag)
+    db.session.commit()
+    return redirect('/tags')
