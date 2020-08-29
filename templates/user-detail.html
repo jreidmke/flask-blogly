@@ -1,21 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %} Users {% endblock %}
+{% block title %} {{user.get_full_name()}} {% endblock %}
 
 {% block content %}
 
-<div class="container">
-    <h1 class="display-2">Users</h1>
+<a href="/">Home</a>
 
+<div class="container mt-5">
     <div class="row">
-
-        {% for user in users %}
-
         <div class="col-3 mx-4">
             <div class="card bg-light" style="width: 18rem;">
                 <img src="{{user.image_url}}" alt="your image">
                 <div class="card-body">
-                    <h5 class="card-title"><a href="/users/{{user.id}}">Hello {{user.get_full_name()}}</a></h5>
+                    <h5 class="card-title"><a href="/users">Hello {{user.get_full_name()}}</a></h5>
                     <ul>
                         {% for post in user.posts %}
                         <li><a href="/posts/{{post.id}}">{{post.title}}</a></li>
@@ -33,7 +30,6 @@
                 </div>
             </div>
         </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}

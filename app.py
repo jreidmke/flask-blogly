@@ -21,7 +21,8 @@ db.create_all()
 
 @app.route('/')
 def show_home():
-    return render_template('home.html')
+    posts = Post.query.all()
+    return render_template('home.html', posts = posts)
 
 @app.route('/users')
 def show_users():
@@ -34,7 +35,7 @@ def show_users():
 @app.route('/users/<int:user_id>')
 def show_user_detail(user_id):
     user = User.query.get_or_404(user_id)
-    return render_template('users.html', user = user)
+    return render_template('user-detail.html', user = user)
 
 # Add New User
 
@@ -47,6 +48,8 @@ def create_new_user():
     first_name = request.form['first_name']
     last_name = request.form['last_name']
     image_url = request.form['image_url']
+    if image_url == '':
+        image_url = 'https://merriam-webster.com/assets/mw/images/article/art-wap-article-main/egg-3442-e1f6463624338504cd021bf23aef8441@1x.jpg'
     new_user = User(first_name = first_name, last_name = last_name, image_url = image_url)
     db.session.add(new_user)
     db.session.commit()
@@ -101,7 +104,7 @@ def add_post(user_id):
         tag = PostTag(post_id=post.id, tag_id = tag)
         db.session.add(tag)
     db.session.commit()
-    return redirect(f'/users/{user.id}')
+    return redirect(f'/')
 
 # Show post details
 

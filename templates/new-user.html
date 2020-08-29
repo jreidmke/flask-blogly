@@ -3,16 +3,20 @@
 {% block title %} Add New User {% endblock %}
 
 {% block content %}
+<div class="container">
 
-<h1>Add New User</h1>
+    <h1>Add New User</h1>
+    <div class="form-group">
 
-<form action='/users' method="post">
-    <input type="text" name="first_name" placeholder="First Name">
-    <input type="text" name="last_name" placeholder="Last Name">
-    <input type="url" name="image_url" placeholder="URL For Your Profile Image">
+        <form action='/users' method="post">
+            <input type="text" class="form-control my-1" name="first_name" placeholder="First Name">
+            <input type="text" class="form-control" name="last_name" placeholder="Last Name">
+            <input type="url" class="form-control my-1" name="image_url" placeholder="URL For Your Profile Image">
 
-    <button>Submit</button>
+            <button class="btn btn-primary btn-block mt-2">Submit</button>
 
-</form>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

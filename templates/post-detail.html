@@ -9,6 +9,10 @@
             <h1 class="display-1 text-center">{{post.title}}</h1>
         </div>
 
+        <div class="row">
+            <h5><a href="/users/{{post.users.id}}">{{post.users.get_full_name()}}</a></h5>
+        </div>
+
 
         <div class="row">
             <h4 class='text-left'>{{post.content}}</h4>
