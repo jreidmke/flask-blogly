@@ -14,11 +14,15 @@
             <input type="text" class="form-control" name="title" placeholder="{{post.title}}">
             <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" placeholder="{{post.content}}" name="content"></textarea>
 
-
             <div class="form-check form-check-inline m-3">
                 {% for tag in tags %}
-                    <input type="checkbox" class="form-check-input" name='tags' value={{tag.id}}>
-                    <label for='tags' class="form-check-label mr-3">{{tag.name}}</label>
+                        {% if tag.id in tag_ids %}
+                            <input type="checkbox" class="form-check-input" name='tags' value={{tag.id}} checked>
+                            <label for='tags' class="form-check-label mr-3">{{tag.name}}</label>
+                        {% else %}
+                            <input type="checkbox" class="form-check-input" name='tags' value={{tag.id}}>
+                            <label for='tags' class="form-check-label mr-3">{{tag.name}}</label>
+                        {% endif %}
                 {% endfor %}
             </div>
 

@@ -22,7 +22,7 @@ class User(db.Model):
     last_name = db.Column(db.String(30), nullable=False)
     image_url = db.Column(db.String(200), default = 'https://merriam-webster.com/assets/mw/images/article/art-wap-article-main/egg-3442-e1f6463624338504cd021bf23aef8441@1x.jpg')
 
-    posts = db.relationship('Post', backref='users', cascade="all, delete")
+    posts = db.relationship('Post', backref='users', cascade="all, delete-orphan")
 
 class Post(db.Model):
 
@@ -38,11 +38,10 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, nullable=False,
     default=datetime.utcnow)
 
-
     def date_time_print(self):
         return self.created_at.strftime("%a, %m/%d, %I:%M")
 
-    tags = db.relationship('PostTag', cascade="all, delete", backref='post')
+    tags = db.relationship('PostTag', cascade="all, delete-orphan", passive_deletes=True)
 
 class Tag(db.Model):
 
@@ -51,7 +50,7 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
 
-    posts = db.relationship('PostTag', cascade="all, delete", backref='tag')
+    posts = db.relationship('PostTag', backref='tag')
 
 class PostTag(db.Model):
 
@@ -59,6 +58,7 @@ class PostTag(db.Model):
 
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), primary_key=True)
     tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+
 
 def connect_db(app):
     db.app = app

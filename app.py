@@ -104,6 +104,7 @@ def add_post(user_id):
         tag = PostTag(post_id=post.id, tag_id = tag)
         db.session.add(tag)
     db.session.commit()
+
     return redirect(f'/')
 
 # Show post details
@@ -119,7 +120,10 @@ def show_post_details(post_id):
 def show_edit_page(post_id):
     post = Post.query.get(post_id)
     tags = Tag.query.all()
-    return render_template('edit-post.html', post=post, tags = tags)
+    tag_ids = []
+    for tag_id in post.tags:
+        tag_ids.append(tag_id.tag_id)
+    return render_template('edit-post.html', post=post, tags = tags, tag_ids = tag_ids)
 
 @app.route('/posts/<int:post_id>/edit', methods=['POST'])
 def make_post_edit(post_id):
