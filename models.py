@@ -5,9 +5,7 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-def connect_db(app):
-    db.app = app
-    db.init_app(app)
+
 
 class User(db.Model):
 
@@ -24,7 +22,7 @@ class User(db.Model):
     last_name = db.Column(db.String(30), nullable=False)
     image_url = db.Column(db.String(200), default = 'https://merriam-webster.com/assets/mw/images/article/art-wap-article-main/egg-3442-e1f6463624338504cd021bf23aef8441@1x.jpg')
 
-    posts = db.relationship('Post', backref='users')
+    posts = db.relationship('Post', backref='users', cascade="all, delete")
 
 class Post(db.Model):
 
@@ -40,6 +38,10 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, nullable=False,
     default=datetime.utcnow)
 
+
+    def date_time_print(self):
+        return self.created_at.strftime("%a, %m/%d, %I:%M")
+
     tags = db.relationship('PostTag', cascade="all, delete", backref='post')
 
 class Tag(db.Model):
@@ -51,11 +53,13 @@ class Tag(db.Model):
 
     posts = db.relationship('PostTag', cascade="all, delete", backref='tag')
 
-
-
 class PostTag(db.Model):
 
     __tablename__ = 'post_tags'
 
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), primary_key=True)
     tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+
+def connect_db(app):
+    db.app = app
+    db.init_app(app)

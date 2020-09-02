@@ -21,7 +21,7 @@ db.create_all()
 
 @app.route('/')
 def show_home():
-    posts = Post.query.all()
+    posts = Post.query.order_by(Post.created_at.desc()).all()
     return render_template('home.html', posts = posts)
 
 @app.route('/users')
