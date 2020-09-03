@@ -41,7 +41,7 @@ class Post(db.Model):
     def date_time_print(self):
         return self.created_at.strftime("%a, %m/%d, %I:%M")
 
-    tags = db.relationship('PostTag', cascade="all, delete-orphan", passive_deletes=True)
+    tags = db.relationship('PostTag', cascade='all, delete', backref='post')
 
 class Tag(db.Model):
 
@@ -50,14 +50,14 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
 
-    posts = db.relationship('PostTag', backref='tag')
+    posts = db.relationship('PostTag', cascade='all, delete', backref='tag')
 
 class PostTag(db.Model):
 
     __tablename__ = 'post_tags'
 
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), primary_key=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id', ondelete="cascade"), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id', ondelete="cascade"), primary_key=True)
 
 
 def connect_db(app):
